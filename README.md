@@ -1,6 +1,6 @@
 # faster-gh-cli-skill
 
-GitHub's [`gh` CLI](https://cli.github.com/) is usually the fastest and safest way for an agent to work with GitHub. This skill exists to make those `gh` interactions more reliable: fewer browser clicks, fewer malformed PR bodies, fewer guessed JSON fields, and fewer dead-end retries after permission errors.
+GitHub's [`gh` CLI](https://cli.github.com/) is usually the fastest and safest way for an agent to work with GitHub. This skill exists to make those `gh` interactions more reliable: fewer manual steps, fewer malformed PR bodies, fewer guessed JSON fields, and fewer dead-end retries after permission errors.
 
 ## Install
 
@@ -9,8 +9,6 @@ npx skills add zeke/faster-gh-cli-skill
 ```
 
 ## What it covers
-
-- Prefer `gh` and `gh api` over browser automation for GitHub work.
 
 - Always establish auth, repo, and branch context before reading or changing GitHub state.
 

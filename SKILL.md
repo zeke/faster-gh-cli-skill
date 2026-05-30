@@ -13,7 +13,7 @@ compatibility: Requires gh, git, jq for some examples, GitHub network access, an
 
 # GitHub CLI: faster patterns
 
-Use `gh` for GitHub work instead of browser automation whenever possible. It is faster, easier to audit, and less likely to click the wrong thing.
+Use `gh` for GitHub work whenever possible. It is fast, scriptable, and easy to audit.
 
 ## First checks
 
@@ -248,7 +248,7 @@ Be careful with value types:
 
 Do not use `-f enabled=true` when the API requires a boolean. That sends the string `"true"` and often returns HTTP 422.
 
-Permission errors are usually real. If `gh api` says the operation needs `admin:org`, `workflow`, or another scope, check `gh auth status`; do not start `gh auth refresh` unless the user can complete the browser/device flow.
+Permission errors are usually real. If `gh api` says the operation needs `admin:org`, `workflow`, or another scope, check `gh auth status`; do not start `gh auth refresh` unless the user can complete the interactive device flow.
 
 ## Secrets
 
@@ -288,7 +288,6 @@ If using stdin, include `-` and provide content. A blank stdin returns `a gist f
 
 | Anti-pattern                                  | Instead                                                   |
 | --------------------------------------------- | --------------------------------------------------------- |
-| Browser automation for GitHub reads/writes    | Use `gh` or `gh api`                                      |
 | Relying on current repo from an unknown cwd    | Pass `--repo owner/name`                                  |
 | Parsing human output when JSON is available   | Use `--json` and `--jq`                                   |
 | Guessing JSON fields repeatedly               | Ask the command for available fields, then retry          |
