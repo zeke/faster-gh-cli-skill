@@ -45,6 +45,10 @@ The analysis covered:
 
 The raw session logs are not included. The skill contains only distilled command patterns and aggregate findings.
 
+## More Skills
+
+Browse more skills at [zeke/skills](https://github.com/zeke/skills).
+
 ## License
 
 MIT
