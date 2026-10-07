@@ -22,6 +22,8 @@ npx skills add zeke/faster-gh-cli-skill
 
 - PR workflows: inspect branch state before `gh pr create`, use `--head user:branch` for forks, avoid retrying branch errors blindly, and use supported diff/check commands.
 
+- Stacked PRs: recognize when a PR is part of a stack, use `gh stack` with non-interactive flags, and never `gh pr merge` or hand-chain base branches for stacked PRs. Defers to GitHub's official [`gh-stack` skill](https://github.com/github/gh-stack/tree/main/skills/gh-stack) for deeper workflows.
+
 - Actions workflows: use `gh pr checks`, `gh run list`, `gh run view --log-failed`, and avoid unattended `gh run watch` unless waiting is explicitly part of the task.
 
 - `gh api` type handling: use `--field enabled:=true` for booleans, `--raw-field` for strings, and `--input` for complex JSON. Avoid sending string booleans to APIs that require real booleans.

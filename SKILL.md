@@ -3,7 +3,7 @@ name: faster-gh-cli-skill
 description: >
   GitHub CLI gh usage guide for agents. Load this skill whenever you are about
   to use gh, GitHub CLI, GitHub PRs, issues, comments, reviews, Actions runs,
-  repositories, secrets, gists, or gh api. Covers reliable command patterns,
+  repositories, secrets, gists, stacked PRs, or gh api. Covers reliable command patterns,
   JSON field gotchas, shell quoting for Markdown bodies, non-interactive auth,
   pull request workflows, Actions log inspection, and common gh failure modes
   observed in real OpenCode sessions.
@@ -147,6 +147,39 @@ EOF
 ```
 
 For inline review comments, prefer `gh api` only after reading existing comments and the PR files. GitHub's review comment API is strict about `commit_id`, `path`, `side`, `line`, and `start_line`; invalid positioning returns HTTP 422. If responding to an existing inline comment, reply to that comment instead of creating a new top-level PR comment.
+
+## Stacked PRs
+
+GitHub supports [stacked pull requests](https://docs.github.com/en/pull-requests/get-started/about-stacked-prs): a chain of PRs in the same repo where the bottom PR targets the trunk (usually `main`) and each PR above targets the branch below it. They are managed with the `gh stack` extension (`gh extension install github/gh-stack`). For deeper stack work, install GitHub's official `gh-stack` skill: `npx skills add github/gh-stack`.
+
+Suspect a stack when a PR's `baseRefName` is another feature branch instead of the default branch, or when the user mentions stacks, layers, or dependent PRs. Check before acting:
+
+```sh
+gh extension list | grep gh-stack
+gh stack view --json
+```
+
+`gh pr view --json` has no stack field as of `gh` 2.96.0. `gh stack view --json` exits 2 when the current branch is not in a stack, and exits 9 when stacked PRs are not enabled for the repo.
+
+`gh stack` opens prompts or full-screen TUIs when attached to a terminal. Always pass explicit targets and non-interactive flags:
+
+| Instead of                       | Use                                                     |
+| -------------------------------- | ------------------------------------------------------- |
+| `gh stack view`                  | `gh stack view --json`                                  |
+| `gh stack submit`                | `gh stack submit --auto`, plus `--open` for non-drafts  |
+| `gh stack init` / `add`          | `gh stack init <branch>` / `gh stack add <branch>`      |
+| `gh stack checkout` / `switch`   | `gh stack checkout <pr-or-branch>`, `up`, `down`, `top` |
+| `gh stack merge`                 | `gh stack merge <pr-or-stack> --yes`                    |
+| `gh stack modify`                | Avoid. TUI only.                                        |
+
+Rules for stacked PRs:
+
+- Do not use `gh pr merge` on a stacked PR. Use `gh stack merge`. Stacks merge bottom-up, and merging a mid-stack PR also merges every PR below it.
+- Do not hand-chain PRs with `gh pr create --base other-feature-branch` and `gh pr edit --base`. Use `gh stack submit --auto`, or `gh stack link <bottom> ... <top>` to stack existing branches or PRs.
+- Do not manually rebase each branch. Use `gh stack rebase` (or `gh stack sync`) for a cascading rebase, then `gh stack push`. On conflict (exit 3), resolve, `git add`, then `gh stack rebase --continue`.
+- Commit a change on the layer that owns it, not on the top branch. Check out that layer, commit, then `gh stack rebase --upstack`.
+- If the repo has more than one remote, pass `--remote <name>` to `push`, `submit`, `sync`, `rebase`, and `link`.
+- Cross-fork stacks are not supported. All branches must be in the same repository.
 
 ## Issues
 
@@ -297,6 +330,8 @@ If using stdin, include `-` and provide content. A blank stdin returns `a gist f
 | `gh pr diff --stat`                           | `gh pr view --json additions,deletions,changedFiles`      |
 | `gh gist create --private`                    | Omit `--public` for secret gists                          |
 | `-f enabled=true` for API booleans             | `--field enabled:=true` or `--input` with JSON            |
+| `gh pr merge` on a stacked PR                 | `gh stack merge <pr> --yes`                               |
+| Bare `gh stack` commands that open a TUI      | Pass explicit targets, `--json`, `--auto`, or `--yes`     |
 
 ## Recovery checklist
 
